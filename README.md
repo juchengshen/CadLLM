@@ -3,7 +3,7 @@
 CadLLM is a training‑free, plug‑and‑play controller that improves the inference throughput of masked diffusion language models (dLLMs) by adapting decoding policies based on lightweight confidence signals produced by the model itself. Across GSM8K, MATH, MBPP and HumanEval, CadLLM delivers up to 2.28× throughput over strong Fast‑dLLM baselines while maintaining competitive accuracy (single NVIDIA H100).
 
 <div align="center">
-  <img src="asset/algo_overview,png.png" alt="CadLLM overview" width="800"/>
+  <img src="asset/algo_overview.png" alt="CadLLM overview" width="800"/>
   <p>CadLLM replaces fixed schedules with confidence‑aware adaptive policies: block size, step budget, vocabulary size, and threshold.</p>
   <br/>
   <img src="asset/step_block_heatmap.png" alt="Per-block per-step confidence heatmaps" width="600"/>
@@ -16,7 +16,7 @@ CadLLM is a training‑free, plug‑and‑play controller that improves the infe
 - Fixed decoding schedules miss opportunities to save compute where predictions are already stable, and to spend it where uncertainty remains.
 - CadLLM introduces four confidence‑guided policies that dynamically reallocate computation without retraining.
 
-## Core Ideas (from the paper)
+## Core Ideas
 
 - **Adaptive block size (B_t)**: Scale the active block proportionally to recent average confidence to amortize forward passes in easy regions and localize refinement in hard ones.
 - **Adaptive steps (S_t)**: Allocate more refinement steps when confidence is low and fewer when it is high to balance speed and quality.
@@ -37,7 +37,7 @@ All four are training‑free and model‑agnostic, and work with either prefix�
 ├── asset/                        # Figures used in this README
 │   ├── step_block_heatmap.png
 │   ├── softmax_latency.png
-│   └── algo_overview,png.png
+│   └── algo_overview.png
 ```
 
 ## Install
@@ -77,11 +77,12 @@ input_ids = torch.tensor(tokenizer(prompt)['input_ids'], device=device).unsqueez
 
 out, nfe, _ = generate_cadllm(
     model, input_ids,
-    initial_steps=32, max_steps=64, gen_length=256,
-    initial_block_length=48, temperature=0.0,
+    initial_steps=24, max_steps=90, gen_length=256,
+    initial_block_length=24, temperature=0.0,
     remasking='low_confidence',
     adaptive_blocks=True, adaptive_steps=True,
     adaptive_threshold=True, adaptive_vocab_size=True,
+    max_block=64, min_block=4, confidence_method='softmax',
     prophet_enabled=False  # optional early-exit via prophet (off by default)
 )
 
@@ -93,17 +94,12 @@ print(tokenizer.decode(out[0][input_ids.shape[1]:], skip_special_tokens=True))
 Directly use each .sh script in `llada/` for evaluation:
 
 ```bash
-# GSM8K (main + variants)
+# GSM8K / MATH / HumanEval / MBPP
 bash llada/eval_gsm8k.sh
 bash llada/eval_gsm8k_ablations.sh
-bash llada/eval_gsm8k_softmax_entropy.sh
-bash llada/eval_gsm8k_512.sh
-
-# MATH / HumanEval / MBPP
 bash llada/eval_math.sh
-bash llada/eval_math_512.sh
 bash llada/eval_humaneval.sh
-bash llada/eval_mbpp_512.sh
+bash llada/eval_mbpp.sh
 ```
 
 ## Configuration
@@ -119,18 +115,18 @@ bash llada/eval_mbpp_512.sh
 
 ### Main Results
 
-Setup: Single NVIDIA H100. Benchmarks: GSM8K (5-shot), MATH (4-shot), MBPP (3-shot, pass@1), HumanEval (0-shot, pass@1). Generation lengths g=256 (upper row) and g=512 (lower row). Each cell: Accuracy (%) | Tokens/s (Speedup vs. Fast‑dLLM threshold).
+Setup: Single NVIDIA H100. Benchmarks: GSM8K (5-shot), MATH (4-shot), MBPP (3-shot, pass@1), HumanEval (0-shot, pass@1). Generation lengths g=256 and g=512. Each cell shows: accuracy% · tokens/s (speedup vs. Fast‑dLLM threshold).
 
-| Benchmark | CadLLM (ours) | Fast‑dLLM (factor) | Fast‑dLLM (threshold) |
+| Benchmark (g) | CadLLM (ours) | Fast‑dLLM (factor) | Fast‑dLLM (threshold) |
 |---|---|---|---|
-| GSM8K | 78.01 | 120.07 (1.33×) | 76.19 | 119.18 (1.32×) | 79.00 | 90.40 (1.00×) |
-|  | 75.44 | 107.79 (1.37×) | 74.45 | 100.66 (1.27×) | 75.28 | 78.77 (1.00×) |
-| MATH | 32.06 | 106.84 (1.34×) | 32.22 | 109.97 (1.38×) | 32.40 | 79.58 (1.00×) |
-|  | 34.94 | 117.21 (1.14×) | 35.40 | 111.86 (1.08×) | 32.06 | 103.18 (1.00×) |
-| MBPP | 24.00 | 99.86 (1.37×) | 21.20 | 96.01 (1.31×) | 25.60 | 73.15 (1.00×) |
-|  | 13.00 | 104.62 (1.35×) | 13.20 | 100.73 (1.30×) | 14.20 | 77.71 (1.00×) |
-| HEval | 35.97 | 220.81 (2.28×) | 32.92 | 132.28 (1.37×) | 37.19 | 96.84 (1.00×) |
-|  | 43.29 | 163.72 (1.74×) | 41.46 | 131.14 (1.38×) | 45.12 | 94.41 (1.00×) |
+| GSM8K (256) | 78.01% · 120.07 (1.33×) | 76.19% · 119.18 (1.32×) | 79.00% · 90.40 (1.00×) |
+| GSM8K (512) | 75.44% · 107.79 (1.37×) | 74.45% · 100.66 (1.27×) | 75.28% · 78.77 (1.00×) |
+| MATH (256) | 32.06% · 106.84 (1.34×) | 32.22% · 109.97 (1.38×) | 32.40% · 79.58 (1.00×) |
+| MATH (512) | 34.94% · 117.21 (1.14×) | 35.40% · 111.86 (1.08×) | 32.06% · 103.18 (1.00×) |
+| MBPP (256) | 24.00% · 99.86 (1.37×) | 21.20% · 96.01 (1.31×) | 25.60% · 73.15 (1.00×) |
+| MBPP (512) | 13.00% · 104.62 (1.35×) | 13.20% · 100.73 (1.30×) | 14.20% · 77.71 (1.00×) |
+| HumanEval (256) | 35.97% · 220.81 (2.28×) | 32.92% · 132.28 (1.37×) | 37.19% · 96.84 (1.00×) |
+| HumanEval (512) | 43.29% · 163.72 (1.74×) | 41.46% · 131.14 (1.38×) | 45.12% · 94.41 (1.00×) |
 
 ### Ablations (GSM8K, g=256)
 
@@ -145,5 +141,5 @@ Setup: Single NVIDIA H100. Benchmarks: GSM8K (5-shot), MATH (4-shot), MBPP (3-sh
 
 ## Upcoming Updates
 
-- Integration with DREAM model to verify effectiveness across architectures.
-- Integration with LLaDA‑V for multi‑modal math reasoning (MathVerse, MathVista).
+- [ ] Integration with DREAM model to verify effectiveness across architectures.
+- [ ] Integration with LLaDA‑V for multi‑modal math reasoning (MathVerse, MathVista).
