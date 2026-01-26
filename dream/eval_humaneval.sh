@@ -4,7 +4,7 @@ export HF_DATASETS_TRUST_REMOTE_CODE=true
 export CUDA_VISIBLE_DEVICES=0 # change to desired gpu num
 
 task=humaneval
-length=512
+length=256
 initial_block_length=16
 initial_steps=24
 max_steps=70
@@ -44,5 +44,5 @@ accelerate launch \
   --log_samples \
   --batch_size 1
 
-## NOTICE: use postprocess for humaneval
-# CUDA_VISIBLE_DEVICES=1 python postprocess_code.py /home/js237/CadLLM/dream/evals_results/cadllm/humaneval-ns0-512/Dream-org__Dream-v0-Base-7B/samples_humaneval_2025-11-23T07-51-43.524027.jsonl
+# NOTICE: use postprocess for humaneval
+# python postprocess_code.py <path to .jsonl file under output_path>

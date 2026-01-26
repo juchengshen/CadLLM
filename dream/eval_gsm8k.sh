@@ -4,7 +4,7 @@ export HF_DATASETS_TRUST_REMOTE_CODE=true
 export CUDA_VISIBLE_DEVICES=0 # change to desired gpu num
 
 task=gsm8k
-length=512
+length=256
 initial_block_length=16
 initial_steps=24
 max_steps=70
