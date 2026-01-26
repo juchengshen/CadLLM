@@ -24,19 +24,19 @@ accelerate launch \
     "pretrained=${model},\
     max_new_tokens=${length},\
     diffusion_steps=${length},\
-    add_bos_token=true,\
+    add_bos_token=True,\
     initial_block_length=${initial_block_length},\
-    use_cache=true,\
-    dual_cache=true,\
+    use_cache=True,\
+    dual_cache=True,\
     initial_steps=${initial_steps},\
     max_steps=${max_steps},\
     max_block=${max_block},\
     min_block=${min_block},\
     confidence_method=softmax,\
-    adaptive_blocks=true,\
-    adaptive_steps=true,\
-    adaptive_vocab_size=true,\
-    adaptive_threshold=true" \
+    adaptive_blocks=True,\
+    adaptive_steps=True,\
+    adaptive_vocab_size=True,\
+    adaptive_threshold=True" \
   --tasks ${task} \
   --num_fewshot ${num_fewshot} \
   --output_path evals_results/cadllm/gsm8k-ns${num_fewshot}-${length} \

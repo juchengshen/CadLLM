@@ -11,21 +11,20 @@ max_steps=70
 max_block=48
 min_block=8
 block_length=32
-num_fewshot=5
 steps=$((length / block_length))
 model="Dream-org/Dream-v0-Base-7B"
 
 pretrained=${model}
 max_new_tokens=${length}
 diffusion_steps=${length}
-add_bos_token=true
-use_cache=true
-dual_cache=true
+add_bos_token=True
+use_cache=True
+dual_cache=True
 confidence_method=softmax
-adaptive_blocks=true
-adaptive_steps=true
-adaptive_vocab_size=true
-adaptive_threshold=true
+adaptive_blocks=True
+adaptive_steps=True
+adaptive_vocab_size=True
+adaptive_threshold=True
 ```
 
 ## Main scripts
