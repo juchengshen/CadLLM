@@ -1,6 +1,6 @@
 # Dream Evaluation
 
-## Default parameters
+## Default hyperparameters
 
 ```bash
 task=gsm8k
