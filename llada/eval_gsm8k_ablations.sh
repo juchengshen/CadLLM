@@ -15,6 +15,7 @@ num_fewshot=5
 steps=$((length / block_length))
 factor=1.0
 model_path='GSAI-ML/LLaDA-8B-Instruct'
+base_model_args="model_path=${model_path},gen_length=${length},initial_block_length=${initial_block_length},use_cache=True,base_steps=${base_steps},max_steps=${max_steps},max_block=${max_block},min_block=${min_block},confidence_method=softmax,show_speed=True"
 
 # the following ablations turn one adaptive policy on at a time
 
@@ -26,21 +27,7 @@ accelerate launch \
   --num_fewshot ${num_fewshot} \
   --confirm_run_unsafe_code \
   --model llada_dist \
-  --model_args \
-    "model_path=${model_path},\
-    gen_length=${length},\
-    initial_block_length=${initial_block_length},\
-    use_cache=True,\
-    base_steps=${base_steps},\
-    max_steps=${max_steps},\
-    max_block=${max_block},\
-    min_block=${min_block},\
-    confidence_method=softmax,\
-    show_speed=True,\
-    adaptive_blocks=False,\
-    adaptive_vocab_size=False,\
-    adaptive_steps=False,\
-    adaptive_threshold=True" \
+  --model_args "${base_model_args},adaptive_blocks=False,adaptive_vocab_size=False,adaptive_steps=False,adaptive_threshold=True" \
   --output_path evals_results/cadllm/gsm8k-ns${num_fewshot}-${length}-adaptive_threshold_on \
   --log_samples
 
@@ -52,21 +39,7 @@ accelerate launch \
   --num_fewshot ${num_fewshot} \
   --confirm_run_unsafe_code \
   --model llada_dist \
-  --model_args \
-    "model_path=${model_path},\
-    gen_length=${length},\
-    initial_block_length=${initial_block_length},\
-    use_cache=True,\
-    base_steps=${base_steps},\
-    max_steps=${max_steps},\
-    max_block=${max_block},\
-    min_block=${min_block},\
-    confidence_method=softmax,\
-    show_speed=True,\
-    adaptive_blocks=True,\
-    adaptive_vocab_size=False,\
-    adaptive_steps=False,\
-    adaptive_threshold=False" \
+  --model_args "${base_model_args},adaptive_blocks=True,adaptive_vocab_size=False,adaptive_steps=False,adaptive_threshold=False" \
   --output_path evals_results/cadllm/gsm8k-ns${num_fewshot}-${length}-adaptive_blocks_on \
   --log_samples
 
@@ -78,21 +51,7 @@ accelerate launch \
   --num_fewshot ${num_fewshot} \
   --confirm_run_unsafe_code \
   --model llada_dist \
-  --model_args \
-    "model_path=${model_path},\
-    gen_length=${length},\
-    initial_block_length=${initial_block_length},\
-    use_cache=True,\
-    base_steps=${base_steps},\
-    max_steps=${max_steps},\
-    max_block=${max_block},\
-    min_block=${min_block},\
-    confidence_method=softmax,\
-    show_speed=True,\
-    adaptive_blocks=False,\
-    adaptive_vocab_size=False,\
-    adaptive_steps=True,\
-    adaptive_threshold=False" \
+  --model_args "${base_model_args},adaptive_blocks=False,adaptive_vocab_size=False,adaptive_steps=True,adaptive_threshold=False" \
   --output_path evals_results/cadllm/gsm8k-ns${num_fewshot}-${length}-adaptive_steps_on \
   --log_samples
 
@@ -104,20 +63,6 @@ accelerate launch \
   --num_fewshot ${num_fewshot} \
   --confirm_run_unsafe_code \
   --model llada_dist \
-  --model_args \
-    "model_path=${model_path},\
-    gen_length=${length},\
-    initial_block_length=${initial_block_length},\
-    use_cache=True,\
-    base_steps=${base_steps},\
-    max_steps=${max_steps},\
-    max_block=${max_block},\
-    min_block=${min_block},\
-    confidence_method=softmax,\
-    show_speed=True,\
-    adaptive_blocks=False,\
-    adaptive_vocab_size=True,\
-    adaptive_steps=False,\
-    adaptive_threshold=False" \
+  --model_args "${base_model_args},adaptive_blocks=False,adaptive_vocab_size=True,adaptive_steps=False,adaptive_threshold=False" \
   --output_path evals_results/cadllm/gsm8k-ns${num_fewshot}-${length}-adaptive_vocab_size_on \
   --log_samples

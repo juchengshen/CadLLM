@@ -15,6 +15,7 @@ num_fewshot=5
 steps=$((length / block_length))
 factor=1.0
 model_path='GSAI-ML/LLaDA-8B-Instruct'
+model_args="model_path=${model_path},gen_length=${length},initial_block_length=${initial_block_length},use_cache=True,initial_steps=${initial_steps},max_steps=${max_steps},max_block=${max_block},min_block=${min_block},confidence_method=softmax,adaptive_blocks=True,adaptive_steps=True,adaptive_vocab_size=True,adaptive_threshold=True,show_speed=True"
 
 # cadllm (for the main results table)
 accelerate launch \
@@ -24,18 +25,4 @@ accelerate launch \
   --num_fewshot ${num_fewshot} \
   --confirm_run_unsafe_code \
   --model llada_dist \
-  --model_args \
-    "model_path=${model_path},\
-    gen_length=${length},\
-    initial_block_length=${initial_block_length},\
-    use_cache=True,\
-    initial_steps=${initial_steps},\
-    max_steps=${max_steps},\
-    max_block=${max_block},\
-    min_block=${min_block},\
-    confidence_method=softmax,\
-    adaptive_blocks=True,\
-    adaptive_steps=True,\
-    adaptive_vocab_size=True,\
-    adaptive_threshold=True,\
-    show_speed=True"
+  --model_args "${model_args}"
