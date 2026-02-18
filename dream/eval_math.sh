@@ -14,29 +14,14 @@ block_length=32
 num_fewshot=4
 steps=$((length / block_length))
 model="Dream-org/Dream-v0-Base-7B"
+model_args="pretrained=${model},max_new_tokens=${length},diffusion_steps=${length},add_bos_token=true,initial_block_length=${initial_block_length},use_cache=true,dual_cache=true,initial_steps=${initial_steps},max_steps=${max_steps},max_block=${max_block},min_block=${min_block},confidence_method=softmax,adaptive_blocks=true,adaptive_steps=true,adaptive_vocab_size=true,adaptive_threshold=true"
 
 # cadllm
 accelerate launch \
   --num_processes=1 \
   eval.py \
   --model dream \
-  --model_args \
-    "pretrained=${model},\
-    max_new_tokens=${length},\
-    diffusion_steps=${length},\
-    add_bos_token=True,\
-    initial_block_length=${initial_block_length},\
-    use_cache=True,\
-    dual_cache=True,\
-    initial_steps=${initial_steps},\
-    max_steps=${max_steps},\
-    max_block=${max_block},\
-    min_block=${min_block},\
-    confidence_method=softmax,\
-    adaptive_blocks=True,\
-    adaptive_steps=True,\
-    adaptive_vocab_size=True,\
-    adaptive_threshold=True" \
+  --model_args "${model_args}" \
   --tasks ${task} \
   --num_fewshot ${num_fewshot} \
   --confirm_run_unsafe_code \

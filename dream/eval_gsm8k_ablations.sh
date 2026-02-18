@@ -14,6 +14,7 @@ block_length=32
 num_fewshot=5
 steps=$((length / block_length))
 model="Dream-org/Dream-v0-Base-7B"
+base_model_args="pretrained=${model},max_new_tokens=${length},diffusion_steps=${length},add_bos_token=true,initial_block_length=${initial_block_length},use_cache=true,dual_cache=true,initial_steps=${initial_steps},max_steps=${max_steps},max_block=${max_block},min_block=${min_block},confidence_method=softmax"
 
 # the following ablations turn one adaptive policy on at a time
 
@@ -22,23 +23,7 @@ accelerate launch \
   --num_processes=1 \
   eval.py \
   --model dream \
-  --model_args \
-    "pretrained=${model},\
-    max_new_tokens=${length},\
-    diffusion_steps=${length},\
-    add_bos_token=True,\
-    initial_block_length=${initial_block_length},\
-    use_cache=True,\
-    dual_cache=True,\
-    initial_steps=${initial_steps},\
-    max_steps=${max_steps},\
-    max_block=${max_block},\
-    min_block=${min_block},\
-    confidence_method=softmax,\
-    adaptive_blocks=True,\
-    adaptive_steps=False,\
-    adaptive_vocab_size=False,\
-    adaptive_threshold=False" \
+  --model_args "${base_model_args},adaptive_blocks=true,adaptive_steps=false,adaptive_vocab_size=false,adaptive_threshold=false" \
   --tasks ${task} \
   --num_fewshot ${num_fewshot} \
   --output_path evals_results/cadllm/gsm8k-ns${num_fewshot}-${length}-adaptive_blocks_on \
@@ -50,23 +35,7 @@ accelerate launch \
   --num_processes=1 \
   eval.py \
   --model dream \
-  --model_args \
-    "pretrained=${model},\
-    max_new_tokens=${length},\
-    diffusion_steps=${length},\
-    add_bos_token=True,\
-    initial_block_length=${initial_block_length},\
-    use_cache=True,\
-    dual_cache=True,\
-    initial_steps=${initial_steps},\
-    max_steps=${max_steps},\
-    max_block=${max_block},\
-    min_block=${min_block},\
-    confidence_method=softmax,\
-    adaptive_blocks=False,\
-    adaptive_steps=True,\
-    adaptive_vocab_size=False,\
-    adaptive_threshold=False" \
+  --model_args "${base_model_args},adaptive_blocks=false,adaptive_steps=true,adaptive_vocab_size=false,adaptive_threshold=false" \
   --tasks ${task} \
   --num_fewshot ${num_fewshot} \
   --output_path evals_results/cadllm/gsm8k-ns${num_fewshot}-${length}-adaptive_steps_on \
@@ -78,23 +47,7 @@ accelerate launch \
   --num_processes=1 \
   eval.py \
   --model dream \
-  --model_args \
-    "pretrained=${model},\
-    max_new_tokens=${length},\
-    diffusion_steps=${length},\
-    add_bos_token=True,\
-    initial_block_length=${initial_block_length},\
-    use_cache=True,\
-    dual_cache=True,\
-    initial_steps=${initial_steps},\
-    max_steps=${max_steps},\
-    max_block=${max_block},\
-    min_block=${min_block},\
-    confidence_method=softmax,\
-    adaptive_blocks=False,\
-    adaptive_steps=False,\
-    adaptive_vocab_size=True,\
-    adaptive_threshold=False" \
+  --model_args "${base_model_args},adaptive_blocks=false,adaptive_steps=false,adaptive_vocab_size=true,adaptive_threshold=false" \
   --tasks ${task} \
   --num_fewshot ${num_fewshot} \
   --output_path evals_results/cadllm/gsm8k-ns${num_fewshot}-${length}-adaptive_vocab_size_on \
@@ -106,23 +59,7 @@ accelerate launch \
   --num_processes=1 \
   eval.py \
   --model dream \
-  --model_args \
-    "pretrained=${model},\
-    max_new_tokens=${length},\
-    diffusion_steps=${length},\
-    add_bos_token=True,\
-    initial_block_length=${initial_block_length},\
-    use_cache=True,\
-    dual_cache=True,\
-    initial_steps=${initial_steps},\
-    max_steps=${max_steps},\
-    max_block=${max_block},\
-    min_block=${min_block},\
-    confidence_method=softmax,\
-    adaptive_blocks=False,\
-    adaptive_steps=False,\
-    adaptive_vocab_size=False,\
-    adaptive_threshold=True" \
+  --model_args "${base_model_args},adaptive_blocks=false,adaptive_steps=false,adaptive_vocab_size=false,adaptive_threshold=true" \
   --tasks ${task} \
   --num_fewshot ${num_fewshot} \
   --output_path evals_results/cadllm/gsm8k-ns${num_fewshot}-${length}-adaptive_threshold_on \
@@ -134,23 +71,7 @@ accelerate launch \
   --num_processes=1 \
   eval.py \
   --model dream \
-  --model_args \
-    "pretrained=${model},\
-    max_new_tokens=${length},\
-    diffusion_steps=${length},\
-    add_bos_token=True,\
-    initial_block_length=${initial_block_length},\
-    use_cache=True,\
-    dual_cache=True,\
-    initial_steps=${initial_steps},\
-    max_steps=${max_steps},\
-    max_block=${max_block},\
-    min_block=${min_block},\
-    confidence_method=softmax,\
-    adaptive_blocks=False,\
-    adaptive_steps=False,\
-    adaptive_vocab_size=False,\
-    adaptive_threshold=False" \
+  --model_args "${base_model_args},adaptive_blocks=false,adaptive_steps=false,adaptive_vocab_size=false,adaptive_threshold=false" \
   --tasks ${task} \
   --num_fewshot ${num_fewshot} \
   --output_path evals_results/cadllm/gsm8k-ns${num_fewshot}-${length}-off \
